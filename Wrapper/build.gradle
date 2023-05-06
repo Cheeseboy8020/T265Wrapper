@@ -102,7 +102,7 @@ afterEvaluate {
             // Creates a Maven publication called "release".
             release(MavenPublication) {
                 groupId = "org.robotroopers.wrapper"
-                artifactId "T265Wrapper"
+                artifactId "t265Wrapper"
                 version = android.defaultConfig.versionName
                 artifact("$buildDir/outputs/aar/${project.getName()}-release.aar")
 
