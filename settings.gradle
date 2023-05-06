@@ -22,4 +22,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "T265Wrapper"
-include ':Wrapper'
+include ':wrapper'
