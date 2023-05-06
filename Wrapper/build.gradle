@@ -1,15 +1,18 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'maven-publish'
 }
 
 android {
     namespace 'org.robotroopers.wrapper'
     compileSdk 33
 
+
     defaultConfig {
         minSdk 24
         targetSdk 33
+        versionName "0.1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -17,6 +20,9 @@ android {
             cmake {
                 cppFlags ""
             }
+        }
+        ndk{
+            abiFilters 'armeabi-v7a'
         }
     }
 
@@ -28,7 +34,7 @@ android {
     }
     externalNativeBuild {
         cmake {
-            path "src/main/cpp/CMakeLists.txt"
+            path "CMakeLists.txt"
             version "3.22.1"
         }
     }
@@ -41,6 +47,11 @@ android {
     }
 }
 
+configurations {
+    downloadHeader
+    downloadSo
+}
+
 dependencies {
 
     implementation 'androidx.core:core-ktx:1.8.0'
@@ -49,6 +60,59 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    def version = '2.53.1-robotroopers.1'
+    downloadSo 'com.intel.realsense:librealsense:' + version + '@aar'
+    implementation 'com.intel.realsense:librealsense:' + version + '@aar'
+    downloadHeader 'com.intel.realsense:librealsense:' + version + '@zip'
 
-    implementation files("libs/librealsense-debug.aar")
+    implementation 'com.github.AsianKoala:koawalib:1.6.0'
+
+}
+
+task extractHeaders(type: Sync) {
+    dependsOn configurations.downloadHeader
+    from { configurations.downloadHeader.collect { zipTree(it) } }
+    into "$projectDir/src/main/cpp/include/librealsense2/"
+}
+
+
+task extractSo(type: Sync) {
+    dependsOn configurations.downloadSo
+    from { configurations.downloadSo.collect { zipTree(it) } }
+    include("jni/**")
+    into "$buildDir/"
+}
+
+preBuild.dependsOn(extractHeaders)
+preBuild.dependsOn(extractSo)
+
+afterEvaluate {
+    publishing {
+        publications {
+            // Creates a Maven publication called "release".
+            release(MavenPublication) {
+                groupId = "org.robotroopers.wrapper"
+                artifactId "T265Wrapper"
+                version = android.defaultConfig.versionName
+                artifact("$buildDir/outputs/aar/${project.getName()}-release.aar")
+
+                pom.withXml {
+                    def dependenciesNode = asNode().appendNode('dependencies')
+                    configurations.implementation.allDependencies.each {
+                        if (it.group != null && (it.name != null || "unspecified".equals(it.name)) && it.version != null) {
+                            def dependencyNode = dependenciesNode.appendNode('dependency')
+                            dependencyNode.appendNode('groupId', it.group)
+                            dependencyNode.appendNode('artifactId', it.name)
+                            dependencyNode.appendNode('version', it.version)
+                            if (it.name == "librealsense") {
+                                // There's no way to programmatically get the dependency classifier so we just check the name
+                                // This is important because otherwise Gradle will try to resolve this dep as a jar
+                                dependencyNode.appendNode('type', 'aar')
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
