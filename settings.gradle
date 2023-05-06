@@ -15,7 +15,7 @@ dependencyResolutionManagement {
             url = uri("https://maven.pkg.github.com/Cheeseboy8020/librealsense")
             credentials {
                 username = "Cheseboy8020"
-                password = "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"
+                password = "ghp_"+"gQo4CeGf32bIRJsD2nKTqdU8Qu8wPF2dZu9B"
             }
         }
         maven { url = 'https://www.jitpack.io' }

@@ -39,8 +39,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
         jvmTarget = '1.8'
@@ -88,6 +88,16 @@ preBuild.dependsOn(extractSo)
 
 afterEvaluate {
     publishing {
+        repositories {
+            maven {
+                name = "T265Wrapper"
+                url = uri("https://maven.pkg.github.com/Cheeseboy8020/T265Wrapper")
+                credentials {
+                    username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                    password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+                }
+            }
+        }
         publications {
             // Creates a Maven publication called "release".
             release(MavenPublication) {
