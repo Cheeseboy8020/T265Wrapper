@@ -3,10 +3,8 @@ package org.robotroopers.wrapper
 import android.content.Context
 import android.util.Log
 import com.asiankoala.koawalib.math.Pose
-import com.asiankoala.koawalib.math.Vector
 import com.intel.realsense.librealsense.DeviceListener
 import com.intel.realsense.librealsense.RsContext
-import com.intel.realsense.librealsense.UsbUtilities
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.function.Consumer
 import kotlin.math.atan2
