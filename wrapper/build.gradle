@@ -90,7 +90,7 @@ afterEvaluate {
     publishing {
         repositories {
             maven {
-                name = "t265Wrapper"
+                name = "T265Wrapper"
                 url = uri("https://maven.pkg.github.com/Cheeseboy8020/T265Wrapper")
                 credentials {
                     username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
